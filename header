@@ -1,0 +1,93 @@
+#pragma once
+#include <iostream>
+#include <string>
+#include <math.h>
+using namespace std;
+class Operations {
+public:
+	string some_Str;//основная строка
+	int countUndo = 0;
+	int countRedo = 0;
+	int amountReDoConditions = 0;//размер массива состояний для Redo
+	int amountUndoConditions = 0;//размер массива состояния для Undo
+	string* Undoconditions = new string[50];
+	string* ReDoconditions = new string[50];
+
+	Operations() {
+		string inputString;
+		cin >> inputString;
+		this->some_Str = inputString;
+	};
+
+	string* deleteLastElement(string arr[], int countElements) {
+		string* upbdatedArr = new string[50];
+		for (int i = 0; i < countElements; i++) {
+			upbdatedArr[i] = arr[i];
+		};
+		delete[] arr;
+		return upbdatedArr;
+	}
+
+	string deleteBegin(int countElements) {
+		string upbdatedStr;
+		Undoconditions[amountUndoConditions] = some_Str;
+		amountUndoConditions++;
+		countUndo++;
+		for (int i = 0, j = countElements; i < countElements; i++, j++) {
+			upbdatedStr[i] = some_Str[j];
+		};
+		return upbdatedStr;
+	}
+
+	void addBegin(string additive_value) {
+		Undoconditions[amountUndoConditions] = some_Str;
+		amountUndoConditions++;
+		countUndo++;
+		additive_value += some_Str;
+		some_Str = additive_value;
+	}
+
+	void addEnd(string additive_value) {
+		Undoconditions[amountUndoConditions] = some_Str;
+		amountUndoConditions++;
+		countUndo++;
+		some_Str += additive_value;
+	}
+
+	string deleteEnd(int amount_char_of_delete) {
+		Undoconditions[amountUndoConditions] = some_Str;
+		amountUndoConditions++;
+		countUndo++;
+		string modifiedStr;
+		for (int i = 0; i < some_Str.length() - amount_char_of_delete; i++) {
+			modifiedStr += some_Str[i];
+		};
+		return modifiedStr;
+	}
+
+	void undo() {
+		if (sizeof(Undoconditions) == 0) {
+			cout << "Строка ещё пока никак не изменялась!" << endl;
+		}
+		else {
+			//ReDoconditions[amountReDoConditions - 1] = conditions[sizeof(conditions) / sizeof(conditions[0])];//состояние, которое "откатили", заносим в массив состояний для ReDo
+			ReDoconditions[amountReDoConditions] = some_Str;
+			amountReDoConditions++;
+			countRedo++;
+			some_Str = Undoconditions[amountUndoConditions - 1];//из массива состояний возвращаем последнее из них			
+			Undoconditions = deleteLastElement(Undoconditions, countUndo);
+			countUndo--;
+			amountUndoConditions--;
+		};
+	}
+
+	void redo() {
+		some_Str = ReDoconditions[amountReDoConditions - 1];
+		Undoconditions[amountUndoConditions] = ReDoconditions[amountReDoConditions];
+		amountUndoConditions++;
+		ReDoconditions = deleteLastElement(ReDoconditions, countRedo);
+		countRedo--;
+		amountReDoConditions--;
+	}
+
+};
